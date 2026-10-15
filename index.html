@@ -1,16 +1,357 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LUXWAVE</title>
+<meta name="description" content="now playing — everyday, on repeat">
 <link rel="icon" href="favicon-2026.png">
-<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;background:#fff}a{color:#7b3fe4}</style>
-</head><body>
-<p style="text-align:center"><img src="logo-2026.png" alt="LUXWAVE logo" width="200" height="200" style="border-radius:50%"></p>
-<h1>LUXWAVE</h1>
-<p>LUXWAVE is a YouTube music channel publishing long-form playlist videos — future funk, city pop, lofi and ambient — as everyday background music.</p>
-<p><b>luxwave Publisher</b> is a private tool used only by the channel owner to upload and manage the channel's own videos through the YouTube Data API.</p>
-<ul>
-<li><a href="privacy.html">Privacy Policy</a></li>
-<li><a href="terms.html">Terms of Service</a></li>
-</ul>
-<p>Contact: contact@luxwave.fm</p>
-</body></html>
+<link rel="preload" href="fonts/Paperlogy-4Regular.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Paperlogy";src:url(fonts/Paperlogy-4Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Paperlogy";src:url(fonts/Paperlogy-5Medium.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Paperlogy";src:url(fonts/Paperlogy-7Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{
+  --bg:#0b1024;
+  --card:#141b38;
+  --card-2:#1b2447;
+  --line:#26305a;
+  --text:#e9ecf8;
+  --muted:#9aa3c7;
+  --glow:#ffb547;
+  --glow-2:#ff7a3d;
+  --pink:#ff4fa3;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Paperlogy",system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{display:block;max-width:100%}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:rgba(11,16,36,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1040px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.top-in img{width:32px;height:32px;border-radius:50%}
+.top-in b{font-size:16px;letter-spacing:.04em}
+
+/* header */
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+.cover{position:relative;margin-top:16px;border-radius:8px;overflow:hidden;aspect-ratio:9/2;background:#000}
+.cover img{width:100%;height:100%;object-fit:cover;object-position:50% 55%}
+.head{display:flex;align-items:flex-start;gap:18px;padding:0 20px;flex-wrap:wrap}
+.avatar{position:relative;z-index:1;width:120px;height:120px;margin-top:-56px;border-radius:50%;border:4px solid var(--bg);box-shadow:0 0 32px rgba(255,181,71,.35);flex:none}
+.who{flex:1;min-width:200px;padding-top:12px}
+.who h1{margin:0;font-size:28px;letter-spacing:.03em}
+.who p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.btns{display:flex;gap:8px;padding-top:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+.btn.main{background:var(--glow);color:#1a1205;box-shadow:0 0 18px rgba(255,181,71,.45)}
+.btn.sub{background:var(--card-2);color:var(--text);border:1px solid var(--line)}
+.btn svg{width:16px;height:16px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin-top:22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;color:var(--muted);font:inherit;font-weight:500;font-size:15px;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--text);border-bottom-color:var(--glow)}
+.panel{display:none;padding:20px 0 8px}
+.panel.on{display:block}
+
+/* grid & cards */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.55fr);gap:16px;align-items:start}
+.col{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card h2{margin:0 0 12px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.card h2 a{font-weight:400;font-size:13px;color:var(--muted)}
+.about p{margin:0 0 10px}
+.about .ko{color:var(--muted)}
+.links{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.links a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--card-2);text-decoration:none;font-size:14px}
+.links a:hover{outline:1px solid var(--glow)}
+.links svg{width:18px;height:18px;flex:none}
+.links span{color:var(--muted);margin-left:auto;font-size:13px}
+
+/* video facade */
+.player{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;cursor:pointer}
+.player img{width:100%;height:100%;object-fit:cover}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.play{position:absolute;inset:0;display:grid;place-items:center}
+.play i{width:64px;height:64px;border-radius:50%;background:rgba(11,16,36,.7);display:grid;place-items:center;border:2px solid var(--glow);box-shadow:0 0 24px rgba(255,181,71,.5)}
+.play i::after{content:"";margin-left:5px;border-left:18px solid var(--glow);border-top:11px solid transparent;border-bottom:11px solid transparent}
+.onair{position:absolute;top:12px;left:12px;background:#e5243b;color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;padding:4px 10px;border-radius:6px;display:flex;align-items:center;gap:6px}
+.onair::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.note{color:var(--muted);font-size:13px;margin:10px 0 0}
+.offair{position:absolute;inset:0;z-index:2;display:grid;place-content:center;justify-items:center;gap:12px;padding:16px;text-align:center;background:rgba(11,16,36,.82);cursor:default}
+.offair p{margin:0;font-size:15px}
+.offair button{display:inline-flex;align-items:center;gap:9px;background:var(--glow);color:#1a1205;border:0;font:inherit;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;cursor:pointer;box-shadow:0 0 18px rgba(255,181,71,.45)}
+
+/* volume card */
+.vol{display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px;align-items:center;text-decoration:none;padding:10px;border-radius:12px;background:var(--card-2)}
+.vol:hover{outline:1px solid var(--glow)}
+.vol img{border-radius:8px;aspect-ratio:16/9;object-fit:cover;width:100%}
+.vol b{display:block;font-size:16px}
+.vol small{color:var(--muted);font-size:13px;display:block;margin-top:2px}
+.tag{display:inline-block;margin-top:8px;font-size:12px;padding:2px 8px;border-radius:999px;background:rgba(255,79,163,.15);color:var(--pink)}
+
+/* volume grid */
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.vcard{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.vcard:hover{outline:1px solid var(--glow)}
+.vcard img{aspect-ratio:16/9;object-fit:cover;width:100%}
+.vcard div{padding:12px 14px 14px}
+.vcard b{display:block;font-size:15px}
+.vcard small{color:var(--muted);font-size:13px;display:block;margin-top:2px}
+.back{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;padding:0;margin-bottom:12px}
+.back:hover{color:var(--text)}
+
+/* tracklist */
+.tl{list-style:none;margin:0;padding:0;columns:2;column-gap:24px;font-size:14px}
+.tl li{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);break-inside:avoid}
+.tl time{color:var(--glow);font-variant-numeric:tabular-nums;min-width:52px}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:14px}
+details[open] summary{margin-bottom:10px}
+.credit{color:var(--muted);font-size:13px;margin-top:14px}
+
+/* footer */
+footer{border-top:1px solid var(--line);margin-top:28px}
+.foot{max-width:1040px;margin:0 auto;padding:18px 16px 28px;color:var(--muted);font-size:13px}
+.foot-row{display:flex;gap:8px 16px;flex-wrap:wrap;justify-content:space-between}
+.foot-row a{text-decoration:none}
+.foot-row a:hover{color:var(--text)}
+.foot nav{display:flex;gap:14px}
+.foot .app{margin:8px 0 0;font-size:11.5px;opacity:.6}
+
+@media (max-width:1000px){
+  .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .cover{aspect-ratio:16/7}
+  .head{padding:0;gap:10px;flex-direction:column;align-items:center;text-align:center}
+  .avatar{width:96px;height:96px;margin-top:-72px}
+  .who{min-width:0;padding-top:0}
+  .who p{white-space:nowrap}
+  .btns{padding-top:4px}
+  .who h1{font-size:24px}
+  .btns{width:100%}
+  .btns .btn{flex:1;justify-content:center}
+  .vol{grid-template-columns:1fr}
+  .tl{columns:1}
+  .vgrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in"><img src="logo-2026.png" alt=""><b>LUXWAVE</b></div></div>
+
+<div class="wrap">
+  <div class="cover"><img src="cover.jpg" alt="LUXWAVE studio at night"></div>
+
+  <div class="head">
+    <img class="avatar" src="logo-2026.png" alt="LUXWAVE logo">
+    <div class="who">
+      <h1>LUXWAVE</h1>
+      <p>📻 now playing — everyday, on repeat</p>
+    </div>
+    <div class="btns">
+      <a class="btn main" href="https://www.youtube.com/@luxwave?sub_confirmation=1" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>
+        Subscribe</a>
+      <a class="btn sub" href="https://www.tiktok.com/@luxwave.fm" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="home">Home</button>
+    <button role="tab" aria-selected="false" data-tab="volumes">Volumes</button>
+    <button role="tab" aria-selected="false" data-tab="live">Live</button>
+  </div>
+
+  <!-- HOME -->
+  <section class="panel on" id="home">
+    <div class="grid">
+      <div class="col">
+        <div class="card about">
+          <h2>About</h2>
+          <p>little wave in daily life</p>
+          <p class="ko">내 일상의 작은 파도</p>
+          <p class="ko">日常の、小さな波。</p>
+          <ul class="links">
+            <li><a href="https://www.youtube.com/@luxwave" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="#ff3d3d"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>
+              YouTube<span>@luxwave</span></a></li>
+            <li><a href="https://www.youtube.com/@luxwave/shorts" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#ff3d3d" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10.5 9.5v5l4-2.5z" fill="#ff3d3d" stroke="none"/></svg>
+              Shorts<span>daily</span></a></li>
+            <li><a href="https://www.tiktok.com/@luxwave.fm" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 2h-3.3v13.2a2.9 2.9 0 1 1-2.1-2.8V9a6.3 6.3 0 1 0 5.4 6.2V8.6a7.6 7.6 0 0 0 4.4 1.4V6.7a4.4 4.4 0 0 1-4.4-4.7z"/></svg>
+              TikTok<span>@luxwave.fm</span></a></li>
+            <li><a href="mailto:contact@luxwave.fm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7 10-7"/></svg>
+              Contact<span>contact@luxwave.fm</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <h2>Now playing <a href="#" data-go="live">Live →</a></h2>
+          <div class="player" data-live data-src="https://www.youtube.com/embed/live_stream?channel=UCLpCkoHFzOBdbExlhNf4k1g&autoplay=1&cc_load_policy=0">
+            <img src="img/vol001-scene.jpg" alt="">
+            <span class="onair">LIVE</span>
+            <div class="play"><i></i></div>
+          </div>
+          <p class="note">24/7 stream — press play and leave it on</p>
+        </div>
+
+        <div class="card">
+          <h2>Latest volume <a href="#" data-go="volumes">All volumes →</a></h2>
+          <a class="vol" href="#vol001" data-vol="vol001">
+            <img src="img/vol001.jpg" alt="FUTURE FUNK VOL.001 thumbnail">
+            <div>
+              <b>FUTURE FUNK VOL.001 — Seoul 2088</b>
+              <small>it&#x27;s 2088, and work still needs to be done</small>
+              <small>21 tracks · 1:03:44</small>
+              <span class="tag">future funk</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOLUMES -->
+  <section class="panel" id="volumes">
+    <div class="vgrid">
+      <a class="vcard" href="#vol001" data-vol="vol001">
+        <img src="img/vol001.jpg" alt="FUTURE FUNK VOL.001 thumbnail">
+        <div>
+          <b>VOL.001 — Seoul 2088</b>
+          <small>21 tracks · 1:03:44</small>
+          <span class="tag">future funk</span>
+        </div>
+      </a>
+    </div>
+    <div class="card vdetail" id="vol001" hidden>
+      <button class="back" data-back>← All volumes</button>
+      <h2>VOL.001 — FUTURE FUNK · Seoul 2088</h2>
+      <div class="player" data-src="https://www.youtube.com/embed/Y3Dhpoxt2V4?autoplay=1&cc_load_policy=0">
+        <img src="img/vol001.jpg" alt="FUTURE FUNK VOL.001 thumbnail">
+        <div class="play"><i></i></div>
+      </div>
+      <details open>
+        <summary>Tracklist · 21 tracks</summary>
+        <ol class="tl">
+          <li><time>0:00</time>Neon Inbox</li>
+          <li><time>3:16</time>Cassette Crush</li>
+          <li><time>6:24</time>Talkbox Taxi</li>
+          <li><time>9:49</time>Midnight Mirror Ride</li>
+          <li><time>12:46</time>Seoul Filter Love</li>
+          <li><time>15:31</time>Coffee &amp; Cassettes</li>
+          <li><time>18:29</time>Roller Rink Love</li>
+          <li><time>21:25</time>Chrome Melody Machine</li>
+          <li><time>24:24</time>Flute Funk Express</li>
+          <li><time>27:23</time>Organ After Hours</li>
+          <li><time>30:22</time>Cardio Strobe</li>
+          <li><time>33:16</time>Neon Beep Beep</li>
+          <li><time>36:16</time>Diva Piano Party</li>
+          <li><time>39:15</time>Turbo Pixel Heart</li>
+          <li><time>42:16</time>Seoul Rewind</li>
+          <li><time>45:15</time>Turbo Weekend</li>
+          <li><time>48:11</time>Pixel Sky Signal</li>
+          <li><time>51:11</time>Velvet Ballroom</li>
+          <li><time>54:04</time>Glitter Steps</li>
+          <li><time>57:29</time>Bossa Turbo Lights</li>
+          <li><time>1:00:28</time>Skyline Sax</li>
+        </ol>
+      </details>
+      <p class="credit">Music: original tracks by LUXWAVE, made with Suno (Pro plan)<br>Visuals: original artwork and animation by LUXWAVE (AI-assisted)<br>Mixed and edited by LUXWAVE</p>
+    </div>
+  </section>
+
+  <!-- LIVE -->
+  <section class="panel" id="live">
+    <div class="card">
+      <h2>Now playing</h2>
+      <div class="player" data-live data-src="https://www.youtube.com/embed/live_stream?channel=UCLpCkoHFzOBdbExlhNf4k1g&autoplay=1&cc_load_policy=0">
+        <img src="img/vol001-scene.jpg" alt="">
+        <span class="onair">LIVE</span>
+        <div class="play"><i></i></div>
+      </div>
+      <p class="note">If the stream is between sessions, it comes back within a minute</p>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="foot">
+    <div class="foot-row">
+      <span>© 2026 LUXWAVE · <a href="mailto:contact@luxwave.fm">contact@luxwave.fm</a></span>
+      <nav><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav>
+    </div>
+    <p class="app">luxwave Publisher — the channel's private upload tool (YouTube Data API)</p>
+  </div>
+</footer>
+
+<script>
+const tabs=[...document.querySelectorAll('.tabs button')];
+function show(id,vol){
+  tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  document.querySelector('.vgrid').hidden=!!vol;
+  document.querySelectorAll('.vdetail').forEach(d=>d.hidden=d.id!==vol);
+  document.querySelectorAll('.player iframe, .player .offair').forEach(f=>{
+    const p=f.parentElement; f.remove(); p.querySelectorAll('img,.play,.onair').forEach(e=>e.hidden=false);
+  });
+  try{history.replaceState(null,'','#'+(vol||id))}catch(e){}
+}
+function openVol(v){show('volumes',v);window.scrollTo({top:0,behavior:'smooth'})}
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.dataset.go);window.scrollTo({top:0,behavior:'smooth'})}));
+const LATEST={src:'https://www.youtube.com/embed/Y3Dhpoxt2V4?autoplay=1&cc_load_policy=0'};
+function play(p,src){
+  p.querySelectorAll('iframe,.offair').forEach(e=>e.remove());
+  const f=document.createElement('iframe');
+  f.src=src; f.referrerPolicy='strict-origin-when-cross-origin'; f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen=true;
+  p.querySelectorAll('img,.play,.onair').forEach(e=>e.hidden=true);
+  p.appendChild(f);
+  return f;
+}
+/* live: if the channel is not live, YouTube reports an error -> show off-air notice with the latest volume */
+let ytApi;
+function loadYT(){
+  return ytApi||(ytApi=new Promise(res=>{
+    window.onYouTubeIframeAPIReady=()=>res(window.YT);
+    const t=document.createElement('script'); t.src='https://www.youtube.com/iframe_api'; document.head.appendChild(t);
+  }));
+}
+function offAir(p){
+  p.querySelectorAll('iframe,.offair').forEach(e=>e.remove());
+  p.querySelectorAll('img').forEach(e=>e.hidden=false);
+  p.querySelectorAll('.play,.onair').forEach(e=>e.hidden=true);
+  const o=document.createElement('div'); o.className='offair';
+  o.innerHTML='<p>Live is off air</p><button type="button"><svg viewBox="0 0 12 14" width="12" height="14" fill="currentColor"><path d="M0 0l12 7-12 7z"/></svg>Play latest</button>';
+  o.querySelector('button').addEventListener('click',e=>{e.stopPropagation();play(p,LATEST.src)});
+  o.addEventListener('click',e=>e.stopPropagation());
+  p.appendChild(o);
+}
+function playLive(p){
+  const f=play(p,p.dataset.src+'&enablejsapi=1&origin='+encodeURIComponent(location.origin));
+  loadYT().then(YT=>new YT.Player(f,{events:{onError:()=>offAir(p)}}));
+}
+document.querySelectorAll('.player').forEach(p=>p.addEventListener('click',()=>{
+  if(p.querySelector('iframe,.offair'))return;
+  if(p.hasAttribute('data-live'))playLive(p); else play(p,p.dataset.src);
+}));
+document.querySelectorAll('[data-vol]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openVol(a.dataset.vol)}));
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>show('volumes')));
+if(new URLSearchParams(location.search).get('demo')==='offair')document.querySelectorAll('.player[data-live]').forEach(offAir);
+const start=location.hash.slice(1);
+if(['home','volumes','live'].includes(start))show(start);
+else if(document.querySelector('.vdetail#'+CSS.escape(start||'x')))show('volumes',start);
+</script>
+</body>
+</html>
